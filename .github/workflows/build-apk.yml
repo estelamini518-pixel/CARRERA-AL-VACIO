@@ -18,3 +18,48 @@ jobs:
     steps:
       - name: Descargar proyecto
         uses: actions/checkout@v4
+
+      - name: Instalar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Preparar proyecto Flutter
+        run: |
+          cat > pubspec.yaml <<'EOF'
+          name: carrera_al_vacio
+          description: Videojuego espacial Carrera al Vacio
+          publish_to: "none"
+          version: 1.0.0+1
+
+          environment:
+            sdk: ">=3.3.0 <4.0.0"
+
+          dependencies:
+            flutter:
+              sdk: flutter
+
+          dev_dependencies:
+            flutter_test:
+              sdk: flutter
+            flutter_lints: ^4.0.0
+
+          flutter:
+            uses-material-design: true
+          EOF
+
+      - name: Crear estructura Android
+        run: flutter create --platforms=android --project-name carrera_al_vacio .
+
+      - name: Instalar dependencias
+        run: flutter pub get
+
+      - name: Compilar APK
+        run: flutter build apk --release
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Carrera-al-Vacio-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
